@@ -32,7 +32,14 @@ A production-grade backend system for processing payments, built with **NestJS**
 - Node.js (v18 or higher)
 - Docker Desktop (for running Postgres and Redis)
 
-### Step 1: Configure Environment Variables
+### Step 1: Clone the Repository
+
+```bash
+git clone <repository-url>
+cd payment-processing-system
+```
+
+### Step 2: Configure Environment Variables
 
 Copy the example environment file and update values if necessary:
 
@@ -42,7 +49,7 @@ cp .env.example .env
 
 _(The default values are configured to work with the provided Docker setup)._
 
-### Step 2: Start Infrastructure (Postgres & Redis)
+### Step 3: Start Infrastructure (Postgres & Redis)
 
 Make sure Docker is running, then execute:
 
@@ -50,13 +57,13 @@ Make sure Docker is running, then execute:
 docker-compose up -d
 ```
 
-### Step 3: Install Dependencies
+### Step 4: Install Dependencies
 
 ```bash
 npm install
 ```
 
-### Step 4: Start the Application
+### Step 5: Start the Application
 
 ```bash
 npm run start:dev
@@ -119,14 +126,3 @@ Once the application is running, you can access the full interactive API documen
 ```
 
 3. Check the status via `GET /payments/:id`, it will be updated to `SUCCESS`.
-
----
-
-## 🐙 Git Commits
-
-To commit your changes to your repository, run the following commands:
-
-```bash
-git add .
-git commit -m "feat: complete payment processing system with idempotency, retries, and razorpay mock"
-```
