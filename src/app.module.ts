@@ -6,6 +6,15 @@ import { Dialect } from 'sequelize';
 import * as dotenv from 'dotenv';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { BullModule } from '@nestjs/bullmq';
+import { PaymentModule } from './modules/payment/payment.module';
+import { WebhookModule } from './modules/webhook/webhook.module';
+import { GatewayModule } from './modules/gateway/gateway.module';
+import { QueueModule } from './queue/queue.module';
+import { PaymentModel } from './database/models/payment.model';
+import { PaymentEventModel } from './database/models/payment-event.model';
+import { WebhookLogModel } from './database/models/webhook-log.model';
+
 dotenv.config();
 
 const DB_DIALECT = (process.env.DB_DIALECT || 'postgres') as Dialect;
@@ -13,7 +22,7 @@ const DB_DIALECT = (process.env.DB_DIALECT || 'postgres') as Dialect;
 const config: SequelizeModuleOptions = {
   dialect: DB_DIALECT,
   autoLoadModels: true,
-  models: [],
+  models: [PaymentModel, PaymentEventModel, WebhookLogModel],
   define: {
     timestamps: true,
   },
@@ -35,8 +44,19 @@ const config: SequelizeModuleOptions = {
       database: process.env.DB_DATABASE,
       autoLoadModels: true,
       synchronize: true,
-      logging: true,
+      sync: { force: true },
+      logging: false, // Turn off noisy logs, we have structured logging
     }),
+    BullModule.forRoot({
+      connection: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: Number(process.env.REDIS_PORT) || 6379,
+      },
+    }),
+    QueueModule,
+    PaymentModule,
+    WebhookModule,
+    GatewayModule,
   ],
   controllers: [AppController],
   providers: [AppService],
