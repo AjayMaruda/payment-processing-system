@@ -1,98 +1,132 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Payment Processing System
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A production-grade backend system for processing payments, built with **NestJS**, **Sequelize (PostgreSQL)**, and **BullMQ (Redis)**. This project simulates real-world payment gateway behavior and demonstrates strong backend fundamentals such as idempotency, concurrency control, and failure handling.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 🚀 Features
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Payment Lifecycle**: Supports states like `PENDING`, `PROCESSING`, `SUCCESS`, and `FAILED`.
+- **Failure Handling & Retry Logic**: Uses BullMQ for reliable background processing with **Exponential Backoff** (2s, 4s, 8s) up to 3 attempts.
+- **Idempotency**: Prevents duplicate payments using `x-idempotency-key` headers and deduplicates webhooks using unique event IDs.
+- **Concurrency Control**: Prevents parallel processing of the same payment using database row-level locking (`SELECT ... FOR UPDATE`).
+- **External Gateway Simulation**: Simulates random success (50%), failure (30%), and timeouts (20%) with async webhook delivery.
+- **Razorpay Integration (Mocked)**: Simulates the flow of creating Razorpay orders and handling webhooks without requiring real bank details or accounts.
 
-## Project setup
+---
 
-```bash
-$ npm install
-```
+## 🛠️ Tech Stack
 
-## Compile and run the project
+- **Framework**: NestJS (v11)
+- **Database**: PostgreSQL (via Sequelize ORM)
+- **Queue System**: BullMQ + Redis (for reliable background jobs and retries)
+- **Documentation**: Swagger UI
+- **Containerization**: Docker (for Redis and Postgres)
 
-```bash
-# development
-$ npm run start
+---
 
-# watch mode
-$ npm run start:dev
+## ⚙️ Setup & Installation
 
-# production mode
-$ npm run start:prod
-```
+### Prerequisites
 
-## Run tests
+- Node.js (v18 or higher)
+- Docker Desktop (for running Postgres and Redis)
+
+### Step 1: Configure Environment Variables
+
+Copy the example environment file and update values if necessary:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+cp .env.example .env
 ```
 
-## Deployment
+_(The default values are configured to work with the provided Docker setup)._
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### Step 2: Start Infrastructure (Postgres & Redis)
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Make sure Docker is running, then execute:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+docker-compose up -d
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Step 3: Install Dependencies
 
-## Resources
+```bash
+npm install
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+### Step 4: Start the Application
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+npm run start:dev
+```
 
-## Support
+The application will start on `http://localhost:3000`.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+---
 
-## Stay in touch
+## 📖 API Documentation
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Once the application is running, you can access the full interactive API documentation (Swagger) at:
+👉 **[http://localhost:3000/api-docs](http://localhost:3000/api-docs)**
 
-## License
+### Key Endpoints
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+#### 💳 Payments
+
+- **`POST /payments`**: Initiate a payment.
+  - Requires `x-idempotency-key` header.
+- **`GET /payments/:id`**: Get payment status by ID.
+- **`GET /payments`**: List all payments (filterable by status).
+
+#### 🪝 Webhooks
+
+- **`POST /webhooks/gateway`**: Handles simulated webhook callbacks.
+- **`POST /webhooks/razorpay`**: Handles simulated Razorpay webhooks.
+
+---
+
+## 🧪 How to Test
+
+### 1. Testing Idempotency
+
+1. Call `POST /payments` with a specific `x-idempotency-key` (e.g., `key-101`).
+2. Call it again with the **same** key.
+3. You will notice the second call returns the same payment object and does not create a duplicate in the database.
+
+### 2. Testing Retry Logic
+
+1. Call `POST /payments` to create a payment.
+2. Watch your terminal. If the simulation randomly picks a "Failure" or "Timeout", you will see BullMQ automatically retrying the job after 2s, then 4s, then 8s.
+
+### 3. Testing Razorpay Flow (Mocked)
+
+1. Call `POST /payments`. In the response, you will receive a mock Razorpay Order ID in the `gatewayReferenceId` field.
+2. To simulate a successful payment from Razorpay, call `POST /webhooks/razorpay` with any string in the `x-razorpay-signature` header and the following body (replace with your order ID):
+
+```json
+{
+  "event": "payment.captured",
+  "payload": {
+    "payment": {
+      "entity": {
+        "order_id": "order_YOUR_ID_HERE"
+      }
+    }
+  }
+}
+```
+
+3. Check the status via `GET /payments/:id`, it will be updated to `SUCCESS`.
+
+---
+
+## 🐙 Git Commits
+
+To commit your changes to your repository, run the following commands:
+
+```bash
+git add .
+git commit -m "feat: complete payment processing system with idempotency, retries, and razorpay mock"
+```

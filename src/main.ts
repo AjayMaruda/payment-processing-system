@@ -8,19 +8,16 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('E-Commerce(MVP)')
-    .setDescription('E-Commerce Applicaition.')
+    .setTitle('Payment Processing System')
+    .setDescription('Simulates real-world payment gateway behavior with idempotency and concurrency control.')
     .setVersion('1.0')
-    .addBearerAuth({
-      type: 'http',
-      scheme: 'bearer',
-      bearerFormat: 'JWT',
-      in: 'header',
-    })
     .build();
 
   app.enableCors();
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true,
+    whitelist: true,
+  }));
 
   const adapter = app.get(HttpAdapterHost).httpAdapter;
   app.useGlobalFilters(new AllExceptionFilter(adapter));
